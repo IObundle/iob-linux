@@ -1,2 +1,2 @@
-software/OS_build/*
-submodules/*/*/*
+/software/OS_build
+/submodules/*/*/*
