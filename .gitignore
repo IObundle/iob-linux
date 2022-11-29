@@ -8,6 +8,7 @@
 !/.github
 !/config.mk
 !/Makefile
+!/shell.nix
 !/README.md
 ## Folders:
 !/hardware
