@@ -36,8 +36,8 @@ jobs:
       - name: clean-OS
         run: make clean-OS
       - name: test-dts
-        run: make build-dts
+        run: nix-shell --run "make build-dts"
       - name: test-kernel
-        run: make build-linux-kernel
+        run: nix-shell --run "make build-linux-kernel"
       - name: test-OpenSBI
-        run: make build-opensbi
+        run: nix-shell --run "make build-opensbi"
