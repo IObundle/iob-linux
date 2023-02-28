@@ -1,5 +1,18 @@
-{ pkgs ? (import <nixpkgs> {}).pkgsCross.riscv64 }:
-  pkgs.mkShell {
-    # nativeBuildInputs is usually what you want -- tools you need to run
-    nativeBuildInputs = [ pkgs.buildPackages.dtc ];
+{ pkgs ? import <nixpkgs> {} }:
+pkgs.mkShell {
+  nativeBuildInputs = with pkgs; [
+    # To build the kernel
+    bash
+    gcc
+    fakeroot
+    xz
+    ncurses
+    bc
+    flex
+    bison
+    # To build the device tree
+    dtc
+    # To Run the QEMU simulation
+    qemu
+    ];
 }

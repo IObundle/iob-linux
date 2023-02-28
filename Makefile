@@ -1,7 +1,30 @@
 include config.mk
 
+PROJECT_NAME:=iob_linux
+
+REMOTE_USER?=
+REMOTE_SERVER?=
+ifneq ($(strip $(REMOTE_USER)$(REMOTE_SERVER)),)
+    REMOTE_BUILD := true
+endif
+
 # Rules
-.PHONY: build-OS clean qemu
+.PHONY: build-OS clean-all qemu
+
+build-remote: os_dir
+ifeq ($(REMOTE_BUILD),true)
+	#Copy the project folder to the remote server
+	rsync -avz --exclude='.git' --delete ./ $(REMOTE_USER)@$(REMOTE_SERVER):~/$(PROJECT_NAME)
+
+	# Execute the Makefile targets on the remote server
+	ssh $(REMOTE_USER)@$(REMOTE_SERVER) "cd ~/$(PROJECT_NAME) && make $(MAKECMDGOALS)"
+
+	# Copy the results folder from the remote server to the local machine
+	rsync -avz --exclude='.git' --delete $(REMOTE_USER)@$(REMOTE_SERVER):~/$(PROJECT_NAME)/software/OS_build $(OS_DIR)
+
+	# Exit the Makefile
+	exit 1
+endif
 
 # Automaticaly build minimall Linux OS for IOb-SoC-OpenCryptoLinux
 build-OS: clean-OS build-dts build-opensbi build-rootfs build-linux-kernel
@@ -30,17 +53,22 @@ build-linux-kernel: clean-linux-kernel os_dir
 build-dts: os_dir
 	dtc -O dtb -o $(OS_DIR)/iob_soc.dtb $(OS_SOFTWARE_DIR)/iob_soc.dts
 
+BUILDROOT_VERSION=buildroot-2022.05.2
 build-buildroot: clean-buildroot
-	@wget https://buildroot.org/downloads/buildroot-2022.05.2.tar.gz && tar -xvzf buildroot-2022.05.2.tar.gz -C $(OS_SUBMODULES_DIR) && \
-		cd $(OS_SUBMODULES_DIR)/buildroot-2022.05.2/ && \
+	@wget https://buildroot.org/downloads/$(BUILDROOT_VERSION).tar.gz && tar -xvzf $(BUILDROOT_VERSION).tar.gz -C $(OS_SUBMODULES_DIR) && \
+		cd $(OS_SUBMODULES_DIR)/$(BUILDROOT_VERSION)/ && \
 		$(MAKE) BR2_EXTERNAL=$(OS_SOFTWARE_DIR)/buildroot iob_soc_defconfig && $(MAKE) -j2 && \
-		cp $(OS_SUBMODULES_DIR)/buildroot-2022.05.2/output/images/Image $(OS_DIR)
+		cp $(OS_SUBMODULES_DIR)/$(BUILDROOT_VERSION)/output/images/Image $(OS_DIR)
 
 # Automaticaly test RootFS in QEMU # WIP
-build-qemu: 
+build-qemu-kernel: clean-linux-kernel os_dir
+	cd $(OS_SUBMODULES_DIR)/Linux && \
+		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- rv32_defconfig && \
+		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- -j2 && \
+		cp $(OS_SUBMODULES_DIR)/Linux/arch/riscv/boot/Image $(OS_DIR)
 
-run-qemu: build-qemu
-	qemu-system-riscv32 -M virt -bios qemu_LinuxOS/fw_jump.elf -kernel qemu_LinuxOS/Image -append "rootwait root=/dev/vda ro" -drive file=qemu_LinuxOS/rootfs.ext2,format=raw,id=hd0 -device virtio-blk-device,drive=hd0 -netdev user,id=net0 -device virtio-net-device,netdev=net0 -nographic
+run-qemu: build-qemu-kernel
+	qemu-system-riscv32 -nographic -machine virt -kernel $(OS_SOFTWARE_DIR)/OS_build/Image -append "rootwait root=/dev/vda ro" -drive file=$(OS_SOFTWARE_DIR)/OS_build/rootfs.cpio.gz,format=raw,id=hd0 -device virtio-blk-device,drive=hd0
 
 # Support targets
 os_dir:
@@ -59,10 +87,10 @@ clean-linux-kernel:
 	cd $(OS_SUBMODULES_DIR)/Linux && $(MAKE) ARCH=riscv distclean
 
 clean-buildroot:
-	-@rm -rf $(OS_SUBMODULES_DIR)/buildroot-2022.05.2 && \
-		rm buildroot-2022.05.2.tar.gz
+	-@rm -rf $(OS_SUBMODULES_DIR)/$(BUILDROOT_VERSION) && \
+		rm $(BUILDROOT_VERSION).tar.gz
 
 clean-OS:
-	@rm -rf $(OS_DIR)/*
+	@rm -rf $(OS_DIR)
 
 clean-all: clean-OS
