@@ -7,6 +7,7 @@
 !/.gitmodules
 !/.github
 !/config.mk
+!/Dockerfile
 !/Makefile
 !/shell.nix
 !/README.md
