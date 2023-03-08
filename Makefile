@@ -49,7 +49,7 @@ $(LINUX_VERSION).tar.xz:
 build-dts: $(OS_DIR)
 	dtc -O dtb -o $(OS_DIR)/iob_soc.dtb $(OS_SOFTWARE_DIR)/iob_soc.dts
 
-BUILDROOT_VERSION=buildroot-2022.05.2
+BUILDROOT_VERSION=buildroot-2022.02.10
 BUILDROOT_DIR=$(OS_SUBMODULES_DIR)/$(BUILDROOT_VERSION)
 build-buildroot: $(OS_DIR) $(BUILDROOT_DIR)
 	cd $(BUILDROOT_DIR) && \
