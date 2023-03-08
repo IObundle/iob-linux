@@ -29,12 +29,22 @@ build-rootfs: clean-rootfs os_dir
 		mkdir -p dev && sudo mknod dev/console c 5 1 && sudo mknod dev/ram0 b 1 0 && \
 		find -print0 | cpio -0oH newc | gzip -9 > $(OS_DIR)/rootfs.cpio.gz
 
-build-linux-kernel: clean-linux-kernel os_dir
-	cd $(OS_SUBMODULES_DIR)/Linux && \
-		cp $(OS_SOFTWARE_DIR)/linux_config $(OS_SUBMODULES_DIR)/Linux/arch/riscv/configs/iob_soc_defconfig && \
+LINUX_VERSION=linux-5.15.98
+IMAGE_DIR=$(OS_SUBMODULES_DIR)/$(LINUX_VERSION)/arch/riscv/boot/Image
+build-linux-kernel: clean-linux-kernel os_dir $(IMAGE_DIR)
+		cp $(IMAGE_DIR) $(OS_DIR)
+
+$(IMAGE_DIR): $(OS_SUBMODULES_DIR)/$(LINUX_VERSION)
+	cd $(OS_SUBMODULES_DIR)/$(LINUX_VERSION) && \
+		cp $(OS_SOFTWARE_DIR)/linux_config $(OS_SUBMODULES_DIR)/$(LINUX_VERSION)/arch/riscv/configs/iob_soc_defconfig && \
 		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- iob_soc_defconfig && \
-		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- -j2 && \
-		cp $(OS_SUBMODULES_DIR)/Linux/arch/riscv/boot/Image $(OS_DIR)
+		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- -j4
+
+$(OS_SUBMODULES_DIR)/$(LINUX_VERSION): $(LINUX_VERSION).tar.xz
+	tar -xf $(LINUX_VERSION).tar.xz -C $(OS_SUBMODULES_DIR)
+
+$(LINUX_VERSION).tar.xz:
+	wget https://cdn.kernel.org/pub/linux/kernel/v5.x/$(LINUX_VERSION).tar.xz
 
 build-dts: os_dir
 	dtc -O dtb -o $(OS_DIR)/iob_soc.dtb $(OS_SOFTWARE_DIR)/iob_soc.dts
@@ -64,13 +74,16 @@ os_dir:
 # Clean
 #
 clean-opensbi:
-	cd $(OS_SUBMODULES_DIR)/OpenSBI && $(MAKE) distclean
+	-@cd $(OS_SUBMODULES_DIR)/OpenSBI && $(MAKE) distclean && \
+		rm $(OS_DIR)/fw_*.bin
 
 clean-rootfs:
-	cd $(OS_SUBMODULES_DIR)/busybox && $(MAKE) distclean
+	-@cd $(OS_SUBMODULES_DIR)/busybox && $(MAKE) distclean && \
+		rm $(OS_DIR)/rootfs.cpio.gz
 
 clean-linux-kernel:
-	cd $(OS_SUBMODULES_DIR)/Linux && $(MAKE) ARCH=riscv distclean
+	-@rm -r $(OS_SUBMODULES_DIR)/$(LINUX_VERSION) && \
+		rm $(OS_DIR)/Image
 
 clean-buildroot:
 	-@rm -rf $(OS_SUBMODULES_DIR)/$(BUILDROOT_VERSION) && \
