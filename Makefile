@@ -11,27 +11,13 @@ endif
 # Rules
 .PHONY: build-OS clean-all qemu
 
-build-remote: os_dir
-ifeq ($(REMOTE_BUILD),true)
-	#Copy the project folder to the remote server
-	rsync -avz --exclude='.git' --delete ./ $(REMOTE_USER)@$(REMOTE_SERVER):~/$(PROJECT_NAME)
-
-	# Execute the Makefile targets on the remote server
-	ssh $(REMOTE_USER)@$(REMOTE_SERVER) "cd ~/$(PROJECT_NAME) && make $(MAKECMDGOALS)"
-
-	# Copy the results folder from the remote server to the local machine
-	rsync -avz --exclude='.git' --delete $(REMOTE_USER)@$(REMOTE_SERVER):~/$(PROJECT_NAME)/software/OS_build $(OS_DIR)
-
-	# Exit the Makefile
-	exit 1
-endif
-
 # Automaticaly build minimall Linux OS for IOb-SoC-OpenCryptoLinux
 build-OS: clean-OS build-dts build-opensbi build-rootfs build-linux-kernel
 
 build-opensbi: clean-opensbi os_dir
 	cp -r $(OS_SOFTWARE_DIR)/opensbi_platform/* $(OS_SUBMODULES_DIR)/OpenSBI/platform/ && \
-		cd $(OS_SUBMODULES_DIR)/OpenSBI && $(MAKE) run PLATFORM=iob_soc
+		cd $(OS_SUBMODULES_DIR)/OpenSBI && \
+		CROSS_COMPILE=riscv64-unknown-linux-gnu- $(MAKE) run PLATFORM=iob_soc
 
 build-rootfs: clean-rootfs os_dir
 	cd $(OS_SUBMODULES_DIR)/busybox && \
