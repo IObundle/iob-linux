@@ -3,8 +3,9 @@ This repository organizes and complements the needed tools to create a Linux Ope
 
 ## Requirements (If not using Docker)
 - RISC-V Linux/GNU toolchain: can be obtained from https://github.com/riscv-collab/riscv-gnu-toolchain; after cloning the repository in the terminal `cd` to the respective directory and configure with `./configure --prefix=/opt/riscv --enable-multilib`; After configuring you can build the Linux cross-compiler with `make Linux`.
+- Linux Kernel development requirements: The packages needed depend on the host OS; If using ubuntu or a similar debian based distribution please check out https://wiki.ubuntu.com/Kernel/BuildYourOwnKernel.
 - dtc: dtc can be installed on Debian/Ubuntu with -> `sudo apt-get install device-tree-compiler`
-- build dependencies: `sudo apt install -y autoconf automake autotools-dev curl python3 libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev ninja-build bash binutils bzip2 cpio g++ gcc git gzip locales libncurses5-dev libdevmapper-dev libsystemd-dev make mercurial whois patch perl rsync sed tar unzip wget libssl-dev libfdt-dev`
+- Buildroot system requirements: software dependencies can be found in https://buildroot.org/downloads/manual/manual.html#requirement.
 
 ## How to use Docker (Docker must be installed by the user)
 To build the docker image corresponding to this projects development environment do:
