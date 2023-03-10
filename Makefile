@@ -38,7 +38,7 @@ $(LINUX_IMAGE): $(LINUX_DIR)
 	cd $(LINUX_DIR) && \
 		cp $(OS_SOFTWARE_DIR)/linux_config $(LINUX_DIR)/arch/riscv/configs/iob_soc_defconfig && \
 		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- iob_soc_defconfig && \
-		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- -j4
+		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- -j`nproc`
 
 $(LINUX_DIR):
 	@wget https://cdn.kernel.org/pub/linux/kernel/v5.x/$(LINUX_NAME).tar.xz && \
@@ -54,7 +54,7 @@ BUILDROOT_DIR=$(OS_SUBMODULES_DIR)/$(BUILDROOT_VERSION)
 
 build-buildroot: $(OS_DIR) $(BUILDROOT_DIR)
 	cd $(BUILDROOT_DIR) && \
-		$(MAKE) BR2_EXTERNAL=$(OS_SOFTWARE_DIR)/buildroot iob_soc_defconfig && $(MAKE) -j4 && \
+		$(MAKE) BR2_EXTERNAL=$(OS_SOFTWARE_DIR)/buildroot iob_soc_defconfig && $(MAKE) -j`nproc` && \
 		cp $(BUILDROOT_DIR)/output/images/rootfs.cpio.gz $(OS_DIR)
 
 $(BUILDROOT_DIR):
@@ -71,10 +71,10 @@ $(QEMU_OS_DIR): $(OS_DIR)
 $(QEMU_IMAGE): $(QEMU_OS_DIR) $(LINUX_DIR)
 	cd $(OS_SUBMODULES_DIR)/$(LINUX_NAME) && \
 		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- rv32_defconfig && \
-		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- -j2 && \
+		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- -j`nproc` && \
 		cp $(LINUX_IMAGE) $(QEMU_OS_DIR)
 
-build-qemu: clean-linux-kernel $(QEMU_IMAGE)
+build-qemu: $(QEMU_IMAGE)
 
 run-qemu:
 	qemu-system-riscv32 -machine virt -kernel $(QEMU_OS_DIR)/Image \
