@@ -1,20 +1,37 @@
+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
+/* Copyright (c) 2023 Pedro Antunes <pedronmantunes@gmail.com> */
+
 /dts-v1/;
 
 / {
-  #address-cells = <1>;
-  #size-cells = <1>;
-  model = "IOb-SoC, VexRiscv";
-  compatible = "IOb-SoC, VexRiscv";
+	#address-cells = <1>;
+	#size-cells = <1>;
+	model = "IOb-SoC, VexRiscv";
+	compatible = "IOb-SoC, VexRiscv";
+
+	chosen {
+		stdout-path = "uart0:115200";
+		bootargs = "rootwait console=hvc0 earlycon=sbi root=/dev/ram0 init=/sbin/init";
+		linux,initrd-start = <0x81000000>;
+		linux,initrd-end = <0x81800000>; // max 8MB ramdisk image
+	};
+
+	aliases {
+		console = &uart0;
+		serial0 = &uart0;
+	};
+
 	cpus {
-    #address-cells = <0x1>;
-    #size-cells = <0x0>;
-    timebase-frequency = <100000>;
+		#address-cells = <0x1>;
+		#size-cells = <0x0>;
+		timebase-frequency = <100000>;
 		CPU0: cpu@0 {
-			clock-frequency = <100000000>;
-      device_type = "cpu";
+			clocks = <&clk0>;
+			u-boot,dm-spl;
+			device_type = "cpu";
 			reg = <0x0>;
 			status = "okay";
-      compatible = "riscv";
+			compatible = "riscv";
 			riscv,isa = "rv32imac";
 			mmu-type = "riscv,sv32";
 			d-cache-block-size = <0x40>;
@@ -35,56 +52,77 @@
 			};
 		};
 	};
-	memory@80000000 {
-    device_type = "memory";
-    reg = <0x80000000 0x10000000>;
+
+	clocks {
+		clk0: osc {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <1000000>;
+		};
 	};
-  chosen {
-    bootargs = "rootwait console=hvc0 earlycon=sbi root=/dev/ram0 init=/sbin/init swiotlb=32";
-  	linux,initrd-start = <0x81000000>;
-  	linux,initrd-end = <0x81800000>; // max 8MB ramdisk image
-  };
-  soc {
-    #address-cells = <1>;
-    #size-cells = <1>;
-    compatible = "iobundle,iob-soc", "simple-bus";
-    ranges;
-    clint@60000000 {
-      compatible = "riscv,clint0";
-      interrupts-extended = <&CPU0_intc 3 &CPU0_intc 7>;
-      reg = <0x60000000 0xc0000>;
-      reg-names = "control";
-    };
-    uart@40000000 {
-      compatible = "ns16550a";
-      reg = <0x40000000 0x1000>;
-      clock-frequency = <100000000>;
-      current-speed = <115200>;
-      //interrupt-parent = < &PLIC0 >;
-      interrupts = <0x11 0x1>;
-      reg-shift = <2>; // regs are spaced on 32 bit boundary
-      reg-io-width = <4>; // only 32-bit access are supported
-    };
-    mac: ethernet@70000000 {
-      compatible = "litex,liteeth";
-      reg = <0x70001000 0x100>,
-            <0x70000800 0x100>,
-            <0x70010000 0x2000>;
-      reg-names = "mac", "mdio", "buffer";
-      litex,rx-slots = <2>;
-      litex,tx-slots = <2>;
-      litex,slot-size = <0x800>;
-      interrupts = <0x11 0x2>;
-      phy-handle = <&eth_phy>;
 
-      mdio {
-        #address-cells = <1>;
-        #size-cells = <0>;
+	memory@80000000 {
+		u-boot,dm-spl;
+		device_type = "memory";
+		reg = <0x80000000 0x20000000>;
+	};
 
-        eth_phy: ethernet-phy@0 {
-          reg = <0>;
-        };
-      };
-    };
-  };
+	soc {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "iobundle,iob-soc", "simple-bus";
+		ranges;
+
+		uart0: uart@40000000 {
+			compatible = "ns16550";
+			reg = <0x40000000 0x1000>;
+			interrupt-parent = < &PLIC0 >;
+			interrupts = <0x1>;
+			reg-shift = <2>; // regs are spaced on 32 bit boundary
+			reg-io-width = <4>; // only 32-bit access are supported
+		};
+
+		eth: ethernet@70000000 {
+			compatible = "litex,liteeth";
+			device_type = "network";
+			reg = <0x70001000 0x100>, <0x70000800 0x100>, <0x70010000 0x2000>;
+			reg-names = "mac", "mdio", "buffer";
+			interrupt-parent = <&PLIC0>;
+			interrupts = <0x11 0x2>;
+			phy-handle = <&phy0>;
+			litex,rx-slots = <2>;
+			litex,tx-slots = <2>;
+			litex,slot-size = <0x800>;
+			liteeth_mdio: mdio {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				phy0: ethernet-phy@0 {
+					reg = <0>;
+				};
+			};
+		};
+
+		clint@60000000 {
+			compatible = "riscv,clint0";
+			interrupts-extended = < &CPU0_intc 3
+									&CPU0_intc 7 >;
+			reg = <0x60000000 0xc0000>;
+			reg-names = "control";
+			clocks = <&clk0>;
+		};
+
+		PLIC0: plic@50000000 {
+			#address-cells = <1>;
+			u-boot,dm-spl;
+			#interrupt-cells = <1>;
+			compatible = "sifive,plic-1.0.0";
+			interrupt-controller;
+			interrupts-extended = < &CPU0_intc 11
+									&CPU0_intc 9 >;
+			reg = <0x50000000 0x04000000>;
+			riscv,max-priority = <7>;
+			riscv,ndev = <2>;
+		};
+	};
 };
