@@ -133,6 +133,27 @@ static int iob_soc_console_init(void)
 			     IOB_SOC_UART_BAUDRATE, 0, 1, 0);
 }
 
+static int iob_soc_plic_warm_irqchip_init(int m_cntx_id, int s_cntx_id)
+{
+	int ret;
+
+	/* By default, enable all IRQs for M-mode of target HART */
+	if (m_cntx_id > -1) {
+		ret = plic_context_init(&plic, m_cntx_id, true, 0x1);
+		if (ret)
+			return ret;
+	}
+
+	/* Enable all IRQs for S-mode of target HART */
+	if (s_cntx_id > -1) {
+		ret = plic_context_init(&plic, s_cntx_id, true, 0x0);
+		if (ret)
+			return ret;
+	}
+
+	return 0;
+}
+
 /*
  * Initialize the iob_soc interrupt controller for current HART.
  */
@@ -148,7 +169,7 @@ static int iob_soc_irqchip_init(bool cold_boot)
 			return ret;
 	}
 
-	return plic_warm_irqchip_init(&plic, 2 * hartid, 2 * hartid + 1);
+	return iob_soc_plic_warm_irqchip_init(2 * hartid, 2 * hartid + 1);
 }
 
 /*
