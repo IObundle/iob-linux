@@ -10,10 +10,8 @@
 	compatible = "IOb-SoC, VexRiscv";
 
 	chosen {
+		bootargs = "console=ttyS0,38400n8 debug loglevel=7";
 		stdout-path = "uart0:115200";
-		// bootargs = "rootwait console=hvc0 earlycon=sbi root=/dev/ram0 init=/sbin/init";
-		// linux,initrd-start = <0x81000000>;
-		// linux,initrd-end = <0x81800000>; // max 8MB ramdisk image
 	};
 
 	aliases {
@@ -27,7 +25,6 @@
 		timebase-frequency = <100000>;
 		CPU0: cpu@0 {
 			clocks = <&clk0>;
-			u-boot,dm-spl;
 			device_type = "cpu";
 			reg = <0x0>;
 			status = "okay";
@@ -62,7 +59,6 @@
 	};
 
 	memory@80000000 {
-		u-boot,dm-spl;
 		device_type = "memory";
 		reg = <0x80000000 0x20000000>;
 	};
@@ -74,36 +70,25 @@
 		ranges;
 
 		uart0: uart@40000000 {
-			compatible = "ns16550";
+			compatible = "ns16550a";
 			reg = <0x40000000 0x1000>;
 			interrupt-parent = < &PLIC0 >;
-			interrupts = <0x1>;
+			interrupts = <1>;
 			reg-shift = <2>; // regs are spaced on 32 bit boundary
 			reg-io-width = <4>; // only 32-bit access are supported
 		};
 
-		eth: ethernet@70000000 {
-			compatible = "litex,liteeth";
-			device_type = "network";
-			reg = <0x70001000 0x100>, <0x70000800 0x100>, <0x70010000 0x2000>;
-			reg-names = "mac", "mdio", "buffer";
-			interrupt-parent = <&PLIC0>;
-			interrupts = <0x11 0x2>;
-			phy-handle = <&phy0>;
-			litex,rx-slots = <2>;
-			litex,tx-slots = <2>;
-			litex,slot-size = <0x800>;
-			liteeth_mdio: mdio {
-				#address-cells = <1>;
-				#size-cells = <0>;
+		enet0: ethoc@70000000 {
+			compatible = "opencores,ethoc";
+			reg = <0x70000000 0x4000 0x00000000 0x4000>;
+			interrupt-parent = < &PLIC0 >;
+			interrupts = <2>;
+			local-mac-address = [44 37 e6 a6 89 3b];
+			clocks = <&clk0>;
+        };
 
-				phy0: ethernet-phy@0 {
-					reg = <0>;
-				};
-			};
-		};
-
-		clint@60000000 {
+		CLINT0: clint@60000000 {
+			#interrupt-cells = <2>;
 			compatible = "riscv,clint0";
 			interrupts-extended = < &CPU0_intc 3
 									&CPU0_intc 7 >;
@@ -113,9 +98,8 @@
 		};
 
 		PLIC0: plic@50000000 {
-			u-boot,dm-spl;
 			#interrupt-cells = <1>;
-			compatible = "sifive,plic-1.0.0";
+			compatible = "riscv,plic0";
 			interrupt-controller;
 			interrupts-extended = < &CPU0_intc 11
 									&CPU0_intc 9 >;
