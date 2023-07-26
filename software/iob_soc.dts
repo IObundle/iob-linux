@@ -69,23 +69,14 @@
 		compatible = "iobundle,iob-soc", "simple-bus";
 		ranges;
 
-		uart0: uart@40000000 {
+		uart0: uart@20000000 {
 			compatible = "ns16550a";
-			reg = <0x40000000 0x1000>;
+			reg = <0x20000000 0x1000>;
 			interrupt-parent = < &PLIC0 >;
 			interrupts = <1>;
 			reg-shift = <2>; // regs are spaced on 32 bit boundary
 			reg-io-width = <4>; // only 32-bit access are supported
 		};
-
-		enet0: ethoc@70000000 {
-			compatible = "opencores,ethoc";
-			reg = <0x70000000 0x4000 0x00000000 0x4000>;
-			interrupt-parent = < &PLIC0 >;
-			interrupts = <2>;
-			local-mac-address = [44 37 e6 a6 89 3b];
-			clocks = <&clk0>;
-        };
 
 		CLINT0: clint@60000000 {
 			#interrupt-cells = <2>;
@@ -97,13 +88,13 @@
 			clocks = <&clk0>;
 		};
 
-		PLIC0: plic@50000000 {
+		PLIC0: plic@40000000 {
 			#interrupt-cells = <1>;
 			compatible = "riscv,plic0";
 			interrupt-controller;
 			interrupts-extended = < &CPU0_intc 11
 									&CPU0_intc 9 >;
-			reg = <0x50000000 0x04000000>;
+			reg = <0x40000000 0x04000000>;
 			riscv,max-priority = <7>;
 			riscv,ndev = <2>;
 		};
