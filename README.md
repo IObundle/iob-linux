@@ -9,7 +9,7 @@ This repository organizes and complements the needed tools to create a Linux Ope
 
 ## How to use Docker (Docker must be installed by the user)
 To build the docker image corresponding to this projects development environment do:
-- `docker build --pull --rm -t iob_linux "."`
+- `docker build --pull --rm -t iob_linux "."`, or alternatively it is faster to `docker pull IObundle/iob-linux:latest`
 
 After the build is successfully you can start running a container in interactive mode:
 - `docker run -it iob_linux`

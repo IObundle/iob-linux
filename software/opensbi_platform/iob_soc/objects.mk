@@ -71,6 +71,5 @@ FW_PAYLOAD_OFFSET=0x400000
 else
 FW_PAYLOAD_OFFSET=0x200000
 endif
-# FW_PAYLOAD_ALIGN=0x1000
-# FW_PAYLOAD_PATH="path to next boot stage binary image file"
-FW_PAYLOAD_FDT_ADDR=0x80F80000
+FW_PAYLOAD_PATH=/home/pantunes/Documents/playground/u-boot/u-boot.bin
+FW_PAYLOAD_FDT_ADDR=0x81F80000

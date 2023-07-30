@@ -23,18 +23,18 @@
 #include <sbi_utils/serial/uart8250.h>
 #include <sbi_utils/timer/aclint_mtimer.h>
 
-#define IOB_SOC_PLIC_ADDR		0x50000000
-#define IOB_SOC_PLIC_NUM_SOURCES	32
-#define IOB_SOC_HART_COUNT		1
-#define IOB_SOC_CLINT_ADDR		0x60000000
-#define IOB_SOC_ACLINT_MTIMER_FREQ	100000
-#define IOB_SOC_ACLINT_MSWI_ADDR	(IOB_SOC_CLINT_ADDR + \
+#define IOB_SOC_PLIC_ADDR           0x40000000
+#define IOB_SOC_PLIC_NUM_SOURCES    32
+#define IOB_SOC_HART_COUNT          1
+#define IOB_SOC_CLINT_ADDR          0x60000000
+#define IOB_SOC_ACLINT_MTIMER_FREQ  100000
+#define IOB_SOC_ACLINT_MSWI_ADDR    (IOB_SOC_CLINT_ADDR + \
 					 CLINT_MSWI_OFFSET)
-#define IOB_SOC_ACLINT_MTIMER_ADDR	(IOB_SOC_CLINT_ADDR + \
+#define IOB_SOC_ACLINT_MTIMER_ADDR  (IOB_SOC_CLINT_ADDR + \
 					 CLINT_MTIMER_OFFSET)
-#define IOB_SOC_UART_ADDR		0x40000000
-#define IOB_SOC_UART_INPUT_FREQ	100000000
-#define IOB_SOC_UART_BAUDRATE		115200
+#define IOB_SOC_UART_ADDR           0x20000000
+#define IOB_SOC_UART_INPUT_FREQ     100000000
+#define IOB_SOC_UART_BAUDRATE       115200
 
 static struct platform_uart_data uart = {
 	IOB_SOC_UART_ADDR,
@@ -133,6 +133,27 @@ static int iob_soc_console_init(void)
 			     IOB_SOC_UART_BAUDRATE, 0, 1, 0);
 }
 
+static int iob_soc_plic_warm_irqchip_init(int m_cntx_id, int s_cntx_id)
+{
+	int ret;
+
+	/* By default, enable all IRQs for M-mode of target HART */
+	if (m_cntx_id > -1) {
+		ret = plic_context_init(&plic, m_cntx_id, true, 0x1);
+		if (ret)
+			return ret;
+	}
+
+	/* Enable all IRQs for S-mode of target HART */
+	if (s_cntx_id > -1) {
+		ret = plic_context_init(&plic, s_cntx_id, true, 0x0);
+		if (ret)
+			return ret;
+	}
+
+	return 0;
+}
+
 /*
  * Initialize the iob_soc interrupt controller for current HART.
  */
@@ -148,7 +169,7 @@ static int iob_soc_irqchip_init(bool cold_boot)
 			return ret;
 	}
 
-	return plic_warm_irqchip_init(&plic, 2 * hartid, 2 * hartid + 1);
+	return iob_soc_plic_warm_irqchip_init(2 * hartid, 2 * hartid + 1);
 }
 
 /*

@@ -93,8 +93,9 @@ clean-rootfs:
 		rm $(OS_DIR)/rootfs.cpio.gz
 
 clean-linux-kernel:
-	-@rm -r $(LINUX_DIR) && \
-		rm $(OS_DIR)/Image
+	-@rm -r $(LINUX_DIR)
+	-@rm $(OS_DIR)/Image
+	-@rm $(LINUX_NAME).tar.xz
 
 clean-buildroot:
 	-@rm -rf $(OS_SUBMODULES_DIR)/$(BUILDROOT_VERSION) && \
