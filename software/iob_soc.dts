@@ -52,9 +52,9 @@
         #size-cells = <1>;
         compatible = "iobundle,iob-soc", "simple-bus";
         ranges;
-        uart0: uart@20000000 {
+        uart0: uart@f2000000 {
             compatible = "ns16550a";
-            reg = <0x20000000 0x1000>;
+            reg = <0xf2000000 0x1000>;
             clock-frequency = <100000000>;
             current-speed = <115200>;
             //interrupt-parent = < &PLIC0 >;
@@ -63,11 +63,11 @@
             reg-io-width = <4>; // only 32-bit access are supported
         };
 
-        CLINT0: clint@60000000 {
+        CLINT0: clint@f6000000 {
             compatible = "riscv,clint0";
             interrupts-extended = < &CPU0_intc 3
                                     &CPU0_intc 7 >;
-            reg = <0x60000000 0xc0000>;
+            reg = <0xf6000000 0xc0000>;
             reg-names = "control";
         };
 

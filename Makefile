@@ -3,7 +3,7 @@ include config.mk
 PROJECT_NAME:=iob_linux
 
 # Build Linux OS for IOb-SoC-OpenCryptoLinux
-build-OS: clean-OS build-dts build-opensbi build-rootfs build-linux-kernel
+build-OS: build-dts build-opensbi build-rootfs build-linux-kernel
 
 $(OS_DIR):
 	mkdir $(OS_DIR)
