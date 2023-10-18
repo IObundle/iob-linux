@@ -104,7 +104,5 @@ clean-buildroot:
 clean-OS:
 	@rm -rf $(OS_DIR)
 
-clean-all: clean-OS
-
 # Phony targets
-.PHONY: build-OS clean-OS clean-all build-qemu
+.PHONY: build-OS build-opensbi build-rootfs build-linux-kernel build-dts build-buildroot clean-OS clean-opensbi clean-rootfs clean-linux-kernel clean-buildroot build-qemu
