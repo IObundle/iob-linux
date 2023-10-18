@@ -3,7 +3,7 @@ include config.mk
 PROJECT_NAME:=iob_linux
 
 # Build Linux OS for IOb-SoC-OpenCryptoLinux
-build-OS: clean-OS build-dts build-opensbi build-rootfs build-linux-kernel
+build-OS: build-dts build-opensbi build-rootfs build-linux-kernel
 
 $(OS_DIR):
 	mkdir $(OS_DIR)
@@ -104,7 +104,5 @@ clean-buildroot:
 clean-OS:
 	@rm -rf $(OS_DIR)
 
-clean-all: clean-OS
-
 # Phony targets
-.PHONY: build-OS clean-OS clean-all build-qemu
+.PHONY: build-OS build-opensbi build-rootfs build-linux-kernel build-dts build-buildroot clean-OS clean-opensbi clean-rootfs clean-linux-kernel clean-buildroot build-qemu
