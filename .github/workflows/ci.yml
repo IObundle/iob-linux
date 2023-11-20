@@ -34,12 +34,12 @@ jobs:
         with:
           submodules: 'recursive'
       - name: build-container-image
-        run: docker build --pull --rm -t iob_linux "."
+        run: docker build --pull --rm -t gh_iob_linux "."
       - name: run-container
-        run: docker run --name iob_linux_container -dit iob_linux
+        run: docker run --name gh_iob_linux_container -dit gh_iob_linux
       - name: exec-container
-        run: docker exec iob_linux_container sh -c "make build-OS"
+        run: docker exec gh_iob_linux_container sh -c "make build-OS"
       - name: rm-container
-        run: docker stop iob_linux_container && docker rm iob_linux_container
+        run: docker stop gh_iob_linux_container && docker rm gh_iob_linux_container
       - name: rm-image
-        run: docker rmi iob_linux
+        run: docker rmi gh_iob_linux
