@@ -4,7 +4,7 @@ OS_DIR := $(OS_SOFTWARE_DIR)/OS_build
 OS_SUBMODULES_DIR := $(LINUX_OS_DIR)/submodules
 
 # Build Linux OS for IOb-SoC-OpenCryptoLinux
-build-OS: clean-OS build-dts build-opensbi build-rootfs build-linux-kernel
+build-OS: build-dts build-opensbi build-rootfs build-linux-kernel
 
 $(OS_DIR):
 	mkdir $(OS_DIR)
@@ -94,8 +94,9 @@ clean-rootfs:
 		rm $(OS_DIR)/rootfs.cpio.gz
 
 clean-linux-kernel:
-	-@rm -r $(LINUX_DIR) && \
-		rm $(OS_DIR)/Image
+	-@rm -r $(LINUX_DIR)
+	-@rm $(OS_DIR)/Image
+	-@rm $(LINUX_NAME).tar.xz
 
 clean-buildroot:
 	-@rm -rf $(OS_SUBMODULES_DIR)/$(BUILDROOT_VERSION) && \
@@ -105,4 +106,4 @@ clean-OS:
 	@rm -rf $(OS_DIR)
 
 # Phony targets
-.PHONY: build-OS clean-OS build-qemu
+.PHONY: build-OS build-opensbi build-rootfs build-linux-kernel build-dts build-buildroot clean-OS clean-opensbi clean-rootfs clean-linux-kernel clean-buildroot build-qemu
