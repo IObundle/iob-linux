@@ -9,7 +9,7 @@
 !/config.mk
 !/Dockerfile
 !/Makefile
-!/shell.nix
+!/*.nix
 !/README.md
 ## Folders:
 !/hardware
