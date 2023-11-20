@@ -38,7 +38,7 @@ jobs:
       - name: run-container
         run: docker run --name iob_linux_container -dit iob_linux
       - name: exec-container
-        run: docker exec -it iob_linux_container sh -c "make build-OS"
+        run: docker exec iob_linux_container sh -c "make build-OS"
       - name: rm-container
         run: docker stop iob_linux_container && docker rm iob_linux_container
       - name: rm-image
