@@ -24,7 +24,7 @@ on:
 jobs:
   minimal_OS:
     runs-on: self-hosted
-    timeout-minutes: 30
+    timeout-minutes: 90
     # run even if previous job failed
     if: ${{ !cancelled() }}
     # run after indicated job
@@ -33,11 +33,13 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
-      - name: clean-OS
-        run: make clean-OS
-      - name: test-dts
-        run: nix-shell --run "make build-dts"
-      - name: test-kernel
-        run: nix-shell --run "make build-linux-kernel"
-      - name: test-OpenSBI
-        run: nix-shell --run "make build-opensbi"
+      - name: build-container-image
+        run: docker build --pull --rm -t iob_linux "."
+      - name: run-container
+        run: docker run --name iob_linux_container -dit iob_linux
+      - name: exec-container
+        run: docker exec -it iob_linux_container sh -c "make build-OS"
+      - name: rm-container
+        run: docker stop iob_linux_container && docker rm iob_linux_container
+      - name: rm-image
+        run: docker rmi iob_linux
