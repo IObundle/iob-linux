@@ -3,7 +3,7 @@ This repository is a centralized resource containing essential tools for buildin
 
 The Operating System comprises four key files: the OpenSBI binary file (`fw_jump.bin`), the device tree blob file (`iob_soc.dtb`), the Linux kernel Image file, and the compressed root file system file. Pre-built versions of these files are included in this repository under the [`software/OS_build`](software/OS_build) directory. Additionally, a pre-built version of the Linux kernel for QEMU emulation is available under the same directory.
 
-To recompile these files, utilize the provided Makefile commands detailed in the [Makefile](#makefile-targets) sections. For information on the necessary system requirements and development environment setup to compile all the essential files for running the Linux Operating System on [IOb-SoC-OpenCryptoLinux](https://github.com/IObundle/iob-soc-opencryptolinux), refer to the [development environment](#development-environment-if-not-using-docker) section in this README.md.
+To recompile these files, utilize the provided Makefile commands detailed in the [Makefile](#makefile-targets) sections. For information on the necessary system requirements and development environment setup to compile all the essential files for running the Linux Operating System on [IOb-SoC-OpenCryptoLinux](https://github.com/IObundle/iob-soc-opencryptolinux), refer to the [development environment](#development-environment) section in this README.md.
 
 ## Makefile Targets
 ### `build-OS`
@@ -44,24 +44,33 @@ Before using this Makefile, ensure you have the necessary tools and dependencies
 3. Optionally, run `make build-qemu` to build QEMU target.
 4. Run `make run-qemu` to test the generated OS in QEMU.
 
-## Development Environment (If not using Docker)
-- RISC-V Linux/GNU toolchain: can be obtained from https://github.com/riscv-collab/riscv-gnu-toolchain; after cloning the repository in the terminal `cd` to the respective directory and configure with `./configure --prefix=/opt/riscv --enable-multilib`; After configuring you can build the Linux cross-compiler with `make Linux`.
-- Linux Kernel development requirements: The packages needed depend on the host OS; If using ubuntu or a similar debian based distribution please check out https://wiki.ubuntu.com/Kernel/BuildYourOwnKernel.
-- dtc: dtc can be installed on Debian/Ubuntu with -> `sudo apt-get install device-tree-compiler`
-- Buildroot system requirements: software dependencies can be found in https://buildroot.org/downloads/manual/manual.html#requirement.
+## Development Environment
+Setting up the development environment is essential for building and testing your project. Whether you choose to work directly on your host machine or within a Docker container, the following sections guide you through the necessary steps. Ensure that you have the required tools and dependencies installed to streamline the development process seamlessly.
 
-## How to use Docker (Docker must be installed by the user)
-To build the docker image corresponding to this projects development environment do:
-- `docker build --pull --rm -t iob_linux "."`, or alternatively it is faster to `docker pull IObundle/iob-linux:latest`
+Note: Instead of Docker, you may use the OpenSource solution Podman. Podman provides a lightweight, daemonless container engine that can be used as an alternative to Docker. The commands and workflows are similar, making it a viable choice for containerization in environments where Docker may not be the preferred option.
 
-After the build is successfully you can start running a container in interactive mode:
+### Without Docker
+- **RISC-V Linux/GNU toolchain:**
+  Obtain from [riscv-gnu-toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain). After cloning the repository, navigate to the respective directory and configure with `./configure --prefix=/opt/riscv --enable-multilib`. Build the Linux cross-compiler with `make Linux`.  
+- **Linux Kernel development requirements:**
+  The required packages depend on the host OS. For Ubuntu or similar Debian-based distributions, refer to [Kernel/BuildYourOwnKernel](https://wiki.ubuntu.com/Kernel/BuildYourOwnKernel).  
+- **dtc (device-tree-compiler):**
+  Install on Debian/Ubuntu with `sudo apt-get install device-tree-compiler`.  
+- **Buildroot system requirements:**
+  Software dependencies are listed in the [Buildroot manual](https://buildroot.org/downloads/manual/manual.html#requirement).
+
+### With Docker (Docker must be installed by the user)
+To build the Docker image corresponding to this project's development environment:
+- `docker build --pull --rm -t iob_linux "."`, or alternatively, you can pull the pre-built image: `docker pull IObundle/iob-linux:latest`
+
+After a successful build, run a container in interactive mode:
 - `docker run -it iob_linux`
 
-If the user exits the container, he can always restart it:
+If the user exits the container, they can restart it:
 - `docker restart <container_id>`, where the `<container_id>` can be obtained from `docker ps -a`
 - `docker exec -it <container_id> bash` to run an interactive shell
 
-The following comands allow to copy files or folders from/to the container:
+To copy files or folders to/from the container:
 - `docker cp CONTAINER:SRC_PATH DEST_PATH` or `docker cp SRC_PATH CONTAINER:DEST_PATH`
 
 For example, copying the output of `make build-OS`:
