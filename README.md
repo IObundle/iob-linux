@@ -75,3 +75,5 @@ To copy files or folders to/from the container:
 
 For example, copying the output of `make build-OS`:
 - `docker cp a6a26dbec0cf:/iob_linux/software/OS_build/ software`
+
+Note: Docker must be installed by the user. If not already installed, please follow the instructions at https://docs.docker.com/engine/install/.
