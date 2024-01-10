@@ -18,7 +18,8 @@ platform-objs-y += platform.o
 # Command for platform specific "make run"
 # Useful for development and debugging on plaftform simulator (such as QEMU)
 #
-platform-runcmd = cp build/platform/iob_soc/firmware/*.bin ../../software/OS_build
+OS_BUILD_DIR ?= ../../software/OS_build
+platform-runcmd = cp build/platform/iob_soc/firmware/*.bin $(OS_BUILD_DIR)
 
 #
 # Platform RISC-V XLEN, ABI, ISA and Code Model configuration.
