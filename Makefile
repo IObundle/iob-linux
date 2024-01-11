@@ -3,6 +3,7 @@ OS_SOFTWARE_DIR := $(LINUX_OS_DIR)/software
 OS_BUILD_DIR ?= $(OS_SOFTWARE_DIR)/OS_build
 OS_SUBMODULES_DIR := $(LINUX_OS_DIR)/submodules
 MACROS_FILE ?= $(LINUX_OS_DIR)/build_macros.txt
+REL_BUILD_DIR :=`realpath $(OS_BUILD_DIR) --relative-to=$(LINUX_OS_DIR)`
 
 # Build Linux OS for IOb-SoC-OpenCryptoLinux
 build-OS: build-dts build-opensbi build-rootfs build-linux-kernel
@@ -14,7 +15,7 @@ $(OS_BUILD_DIR):
 build-opensbi: clean-opensbi $(OS_BUILD_DIR)
 	cp -r $(OS_SOFTWARE_DIR)/opensbi_platform/* $(OS_SUBMODULES_DIR)/OpenSBI/platform/
 	$(LINUX_OS_DIR)/scripts/replace_macros.py $(OS_SUBMODULES_DIR)/OpenSBI/platform/iob_soc/platform.c $(MACROS_FILE)
-	CROSS_COMPILE=riscv64-unknown-linux-gnu- $(MAKE) -C $(OS_SUBMODULES_DIR)/OpenSBI run PLATFORM=iob_soc
+	CROSS_COMPILE=riscv64-unknown-linux-gnu- $(MAKE) -C $(OS_SUBMODULES_DIR)/OpenSBI run PLATFORM=iob_soc OS_BUILD_DIR=../../$(REL_BUILD_DIR)
 	rm -r $(OS_SUBMODULES_DIR)/OpenSBI/platform/iob_soc/
 
 ## Busybox rootfs target (for a minimal Linux OS)
