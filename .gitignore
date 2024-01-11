@@ -11,9 +11,11 @@
 !/Makefile
 !/*.nix
 !/README.md
+!/build_macros.txt
 ## Folders:
 !/hardware
 !/software
+!/scripts
 /software/OS_build
 !/submodules
 /submodules/*/*
