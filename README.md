@@ -31,25 +31,26 @@ Cleans the Buildroot build artifacts.
 ## Makefile Variables
 - `LINUX_OS_DIR`: Specifies the directory where the Linux OS is being built. The default value is the current working directory (`$(CURDIR)`).
 - `OS_SOFTWARE_DIR`: Specifies the directory containing software-related files for the OS, such as configuration files and scripts.
-- `OS_DIR`: Specifies the directory where the final OS build artifacts will be placed.
+- `OS_BUILD_DIR`: Specifies the directory where the final OS build artifacts will be placed.
 - `OS_SUBMODULES_DIR`: Specifies the directory where external submodules (such as Linux kernel and Buildroot) are located.
+- `MACROS_FILE`: Specifies the file containing macros for building the Device Tree and OpenSBI.
 - `LINUX_VERSION`: Specifies the version of the Linux kernel to be used (default is 5.15.98).
 - `BUILDROOT_VERSION`: Specifies the version of Buildroot to be used (default is buildroot-2022.02.10).
 
 Before using this Makefile, ensure you have the necessary tools and dependencies installed. Customize these variables to match your project's directory structure and configurations.
 
 ## Makefile Usage
-1. Set the appropriate values for `LINUX_OS_DIR`, `OS_SOFTWARE_DIR`, `OS_DIR`, and `OS_SUBMODULES_DIR` variables.
+1. Set the appropriate values for `LINUX_OS_DIR`, `OS_SOFTWARE_DIR`, `OS_BUILD_DIR`, and `OS_SUBMODULES_DIR` variables.
 2. Run `make build-OS` to build the entire OS.
 3. Optionally, run `make build-qemu` to build QEMU target.
 4. Run `make run-qemu` to test the generated OS in QEMU.
 
 ## Development Environment
-Setting up the development environment is essential for building and testing your project. Whether you choose to work directly on your host machine or within a Docker container, the following sections guide you through the necessary steps. Ensure that you have the required tools and dependencies installed to streamline the development process seamlessly.
+Setting up the development environment is essential for building and testing your project. Whether you choose to work directly on your host machine, Nix environment, or within a Docker container, the following sections guide you through the necessary steps. Ensure that you have the required tools and dependencies installed to streamline the development process seamlessly.
 
 Note: Instead of Docker, you may use the OpenSource solution Podman. Podman provides a lightweight, daemonless container engine that can be used as an alternative to Docker. The commands and workflows are similar, making it a viable choice for containerization in environments where Docker may not be the preferred option.
 
-### Without Docker
+### Without Docker nor Nix
 - **RISC-V Linux/GNU toolchain:**
   Obtain from [riscv-gnu-toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain). After cloning the repository, navigate to the respective directory and configure with `./configure --prefix=/opt/riscv --enable-multilib`. Build the Linux cross-compiler with `make Linux`.  
 - **Linux Kernel development requirements:**
@@ -58,6 +59,12 @@ Note: Instead of Docker, you may use the OpenSource solution Podman. Podman prov
   Install on Debian/Ubuntu with `sudo apt-get install device-tree-compiler`.  
 - **Buildroot system requirements:**
   Software dependencies are listed in the [Buildroot manual](https://buildroot.org/downloads/manual/manual.html#requirement).
+
+### With Nix
+To start the [Nix](https://nixos.org/) environment with included dependencies for building the Device Tree and OpenSBI, run:
+- `nix-shell`
+
+Note: [nix-shell](https://nixos.org/download.html#nix-install-linux) must be installed by the user.
 
 ### With Docker (Docker must be installed by the user)
 To build the Docker image corresponding to this project's development environment:
