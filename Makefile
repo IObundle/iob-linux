@@ -60,9 +60,9 @@ BUILDROOT_VERSION=buildroot-2022.02.10
 BUILDROOT_DIR=$(OS_SUBMODULES_DIR)/$(BUILDROOT_VERSION)
 
 build-buildroot: $(OS_BUILD_DIR) $(BUILDROOT_DIR)
-	cd $(BUILDROOT_DIR) && \
-		$(MAKE) BR2_EXTERNAL=$(OS_SOFTWARE_DIR)/buildroot iob_soc_defconfig && $(MAKE) -j`nproc` && \
-		cp $(BUILDROOT_DIR)/output/images/rootfs.cpio.gz $(OS_BUILD_DIR)
+	$(MAKE) -C $(BUILDROOT_DIR) BR2_EXTERNAL=$(OS_SOFTWARE_DIR)/buildroot iob_soc_defconfig
+	$(MAKE) -C $(BUILDROOT_DIR) -j`nproc`
+	cp $(BUILDROOT_DIR)/output/images/rootfs.cpio.gz $(OS_BUILD_DIR)
 
 $(BUILDROOT_DIR):
 	@wget https://buildroot.org/downloads/$(BUILDROOT_VERSION).tar.gz && \
