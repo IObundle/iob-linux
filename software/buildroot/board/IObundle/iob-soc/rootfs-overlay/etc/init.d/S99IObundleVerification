@@ -2,4 +2,4 @@
 # Script to verify linux functioning
 echo "Test passed!" > /tmp/test.log
 # Send file via UART with Zmodem
-sz /tmp/test.log
+sz -e /tmp/test.log
