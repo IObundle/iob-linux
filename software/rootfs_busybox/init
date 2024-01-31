@@ -5,6 +5,11 @@ echo "### INIT SCRIPT ###"
 /bin/mount -t sysfs sysfs /sys
 /bin/mount -t tmpfs none /tmp
 
+# mdev: dynamic /dev node management
+# check: https://git.busybox.net/busybox/tree/docs/mdev.txt
+echo /sbin/mdev > /proc/sys/kernel/hotplug
+mdev -s
+
 cat <<'EOF'
 XXx     lOXWMMWXOl    :XK                                          XXo  XX.              
 MMO   oWM.      ,MWo  cMN                                          MMd  MM.              
