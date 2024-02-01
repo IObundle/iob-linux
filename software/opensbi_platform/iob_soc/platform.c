@@ -24,7 +24,7 @@
 #include <sbi_utils/timer/aclint_mtimer.h>
 
 #define IOB_SOC_PLIC_ADDR 0x/*PLIC0_ADDR_MACRO*/
-#define IOB_SOC_PLIC_NUM_SOURCES 32
+#define IOB_SOC_PLIC_NUM_SOURCES 31
 #define IOB_SOC_HART_COUNT 1
 #define IOB_SOC_CLINT_ADDR 0x/*CLINT0_ADDR_MACRO*/
 #define IOB_SOC_ACLINT_MTIMER_FREQ /*FREQ_MACRO*/
@@ -137,8 +137,10 @@ static int iob_soc_irqchip_init(bool cold_boot) {
   /* Example if the generic PLIC driver is used */
   if (cold_boot) {
     ret = plic_cold_irqchip_init(&plic);
-    if (ret)
+    if (ret) {
+      sbi_printf("%s: irqchip init failed (error %d)\n",__func__, ret);
       return ret;
+    }
   }
 
   return plic_warm_irqchip_init(&plic, 2 * hartid, 2 * hartid + 1);
@@ -152,8 +154,10 @@ static int iob_soc_ipi_init(bool cold_boot) {
 
   if (cold_boot) {
     ret = aclint_mswi_cold_init(&mswi);
-    if (ret)
+    if (ret) {
+      sbi_printf("%s: aclint mswi init failed (error %d)\n",__func__, ret);
       return ret;
+    }
   }
 
   return aclint_mswi_warm_init();
@@ -167,8 +171,10 @@ static int iob_soc_timer_init(bool cold_boot) {
 
   if (cold_boot) {
     ret = aclint_mtimer_cold_init(&mtimer, NULL);
-    if (ret)
+    if (ret) {
+      sbi_printf("%s: timer init failed (error %d)\n",__func__, ret);
       return ret;
+    }
   }
 
   return aclint_mtimer_warm_init();
