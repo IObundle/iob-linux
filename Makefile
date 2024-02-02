@@ -88,6 +88,24 @@ run-qemu:
 		-initrd $(OS_BUILD_DIR)/rootfs.cpio.gz -nographic \
 		-append "rootwait root=/dev/vda ro" 
 
+
+OS_DRIVERS_DIR ?= $(OS_SOFTWARE_DIR)/drivers
+MODULE_NAME ?= ""
+MODULE_DRIVER_DIR ?= ""
+CALLING_DIR ?= ../../
+ROOTFS_OVERLAY_DIR ?= ../../
+PYTHON_DIR ?= ../../
+build-linux-drivers: build-linux-kernel
+	# copy driver sources to software/drivers
+	cp $(MODULE_DRIVER_DIR)/* $(OS_DRIVERS_DIR)
+	# generate linux driver header
+	cd $(CALLING_DIR) && \
+		$(PYTHON_DIR)/bootstrap.py $(MODULE_NAME) -f gen_linux_driver_header -o `realpath $(CURDIR)/software/drivers --relative-to=$(CALLING_DIR)`
+	# compile linux kernel module
+	make -C $(OS_DRIVERS_DIR) all LINUX_DIR=`realpath $(LINUX_DIR) --relative-to=./software/drivers` MODULE_NAME=$(MODULE_NAME)
+	# copy drivers to rootfs overlay
+	cp -r $(OS_DRIVERS_DIR) $(ROOTFS_OVERLAY_DIR)/
+
 #
 # Clean
 #
@@ -98,6 +116,11 @@ clean-opensbi:
 clean-rootfs:
 	-@$(MAKE) -C $(OS_SUBMODULES_DIR)/busybox distclean
 	-@rm $(OS_BUILD_DIR)/rootfs.cpio.gz
+
+clean-linux-drivers:
+	-@$(MAKE) -C $(OS_DRIVERS_DIR) clean \
+		LINUX_DIR=`realpath $(LINUX_DIR) --relative-to=./software/drivers` 
+	-@rm -rf $(ROOTFS_OVERLAY_DIR)/$(shell basename $(OS_DRIVERS_DIR))
 
 clean-linux-kernel:
 	-@rm -r $(LINUX_DIR)
