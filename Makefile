@@ -6,7 +6,7 @@ MACROS_FILE ?= $(LINUX_OS_DIR)/build_macros.txt
 REL_BUILD_DIR :=`realpath $(OS_BUILD_DIR) --relative-to=$(LINUX_OS_DIR)`
 
 # Build Linux OS for IOb-SoC-OpenCryptoLinux
-build-OS: build-dts build-opensbi build-rootfs build-linux-kernel
+build-OS: build-dts build-opensbi build-buildroot build-linux-kernel
 
 $(OS_BUILD_DIR):
 	mkdir $(OS_BUILD_DIR)
@@ -17,17 +17,6 @@ build-opensbi: clean-opensbi $(OS_BUILD_DIR)
 	$(LINUX_OS_DIR)/scripts/replace_macros.py $(OS_SUBMODULES_DIR)/OpenSBI/platform/iob_soc/platform.c $(MACROS_FILE)
 	CROSS_COMPILE=riscv64-unknown-linux-gnu- $(MAKE) -C $(OS_SUBMODULES_DIR)/OpenSBI run PLATFORM=iob_soc OS_BUILD_DIR=../../$(REL_BUILD_DIR)
 	rm -r $(OS_SUBMODULES_DIR)/OpenSBI/platform/iob_soc/
-
-## Busybox rootfs target (for a minimal Linux OS)
-build-rootfs: clean-rootfs $(OS_BUILD_DIR)
-	cd $(OS_SUBMODULES_DIR)/busybox && \
-		cp $(OS_SOFTWARE_DIR)/rootfs_busybox/busybox_config $(OS_SUBMODULES_DIR)/busybox/configs/iob_defconfig && \
-		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- iob_defconfig && \
-		CROSS_COMPILE=riscv64-unknown-linux-gnu- $(MAKE) -j$(nproc) && \
-		CROSS_COMPILE=riscv64-unknown-linux-gnu- $(MAKE) install && \
-		cd _install/ && cp $(OS_SOFTWARE_DIR)/rootfs_busybox/init init && \
-		mkdir -p dev && sudo mknod dev/console c 5 1 && sudo mknod dev/ram0 b 1 0 && \
-		find -print0 | cpio -0oH newc | gzip -9 > $(OS_BUILD_DIR)/rootfs.cpio.gz
 
 ## Linux Kernel Makefile Variables and Targets
 LINUX_VERSION?=5.15.98
@@ -113,10 +102,6 @@ clean-opensbi:
 	-@$(MAKE) -C $(OS_SUBMODULES_DIR)/OpenSBI distclean
 	-@rm $(OS_BUILD_DIR)/fw_*.bin
 
-clean-rootfs:
-	-@$(MAKE) -C $(OS_SUBMODULES_DIR)/busybox distclean
-	-@rm $(OS_BUILD_DIR)/rootfs.cpio.gz
-
 clean-linux-drivers:
 	-@$(MAKE) -C $(OS_DRIVERS_DIR) clean \
 		LINUX_DIR=`realpath $(LINUX_DIR) --relative-to=./software/drivers` 
@@ -135,4 +120,4 @@ clean-OS:
 	@rm -rf $(OS_BUILD_DIR)
 
 # Phony targets
-.PHONY: build-OS build-opensbi build-rootfs build-linux-kernel build-dts build-buildroot clean-OS clean-opensbi clean-rootfs clean-linux-kernel clean-buildroot build-qemu
+.PHONY: build-OS build-opensbi build-linux-kernel build-dts build-buildroot clean-OS clean-opensbi clean-linux-kernel clean-buildroot build-qemu
