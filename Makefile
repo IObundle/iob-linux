@@ -89,7 +89,7 @@ build-linux-drivers: build-linux-kernel
 	cp $(MODULE_DRIVER_DIR)/* $(OS_DRIVERS_DIR)
 	# generate linux driver header
 	cd $(CALLING_DIR) && \
-		$(PYTHON_DIR)/bootstrap.py $(MODULE_NAME) -f gen_linux_driver_header -o `realpath $(CURDIR)/software/drivers --relative-to=$(CALLING_DIR)`
+		$(PYTHON_DIR)/bootstrap.py $(MODULE_NAME) -f gen_linux_driver_headers -o `realpath $(CURDIR)/software/drivers --relative-to=$(CALLING_DIR)`
 	# compile linux kernel module
 	make -C $(OS_DRIVERS_DIR) all LINUX_DIR=`realpath $(LINUX_DIR) --relative-to=./software/drivers` MODULE_NAME=$(MODULE_NAME)
 	# copy drivers to rootfs overlay
