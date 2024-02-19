@@ -66,6 +66,10 @@ To start the [Nix](https://nixos.org/) environment with included dependencies fo
 
 Note: [nix-shell](https://nixos.org/download.html#nix-install-linux) must be installed by the user.
 
+Note: Currently, the Nix environment does not work for buildroot.
+Please disable the Nix environment before building with buildroot.
+Builroot also downloads most of it's dependencies automatically, so a Nix environment should not be required.
+
 ### With Docker (Docker must be installed by the user)
 To build the Docker image corresponding to this project's development environment:
 - `docker build --pull --rm -t iob_linux "."`, or alternatively, you can pull the pre-built image: `docker pull IObundle/iob-linux:latest`

@@ -44,12 +44,12 @@ def write_linux_swheader(mkregs_obj, table, out_dir, top):
     fswhdr.write(" * `write_linux_swheader` method of `mkregs.py`\n")
     fswhdr.write(" */\n\n")
 
-    core_prefix = f"{top}".upper()
+    core_prefix = top.upper()
 
     fswhdr.write(f"#ifndef H_{core_prefix}_H\n")
     fswhdr.write(f"#define H_{core_prefix}_H\n\n")
     fswhdr.write(f'#define {core_prefix}_DRIVER_NAME "{top}"\n')
-    fswhdr.write(f'#define {core_prefix}_DRIVER_CLASS "iob_class"\n')
+    fswhdr.write(f'#define {core_prefix}_DRIVER_CLASS "{top}"\n')
     fswhdr.write(f'#define {core_prefix}_DEVICE_FILE "/dev/{top}"\n')
     fswhdr.write(
         f'#define {core_prefix}_DEVICE_CLASS "/sys/class/" {core_prefix}_DRIVER_CLASS "/" {core_prefix}_DRIVER_NAME\n\n'
@@ -93,7 +93,7 @@ def write_linux_sysfs_header(table, out_dir, top):
     fswhdr.write(" * `write_linux_sysfs_header` method of `mkregs.py`\n")
     fswhdr.write(" */\n\n")
 
-    core_prefix = f"{top}".upper()
+    core_prefix = top.upper()
 
     fswhdr.write(f"#ifndef H_{core_prefix}_SYSFS_H\n")
     fswhdr.write(f"#define H_{core_prefix}_SYSFS_H\n\n")

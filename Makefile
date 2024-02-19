@@ -106,7 +106,6 @@ clean-opensbi:
 clean-linux-drivers:
 	-@$(MAKE) -C $(OS_DRIVERS_DIR) clean \
 		LINUX_DIR=`realpath $(LINUX_DIR) --relative-to=./software/drivers` 
-	-@rm -rf $(ROOTFS_OVERLAY_DIR)/$(shell basename $(OS_DRIVERS_DIR))
 
 clean-linux-kernel:
 	-@rm -r $(LINUX_DIR)
