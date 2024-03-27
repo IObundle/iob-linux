@@ -88,3 +88,19 @@ For example, copying the output of `make build-OS`:
 - `docker cp a6a26dbec0cf:/iob_linux/software/OS_build/ software`
 
 Note: Docker must be installed by the user. If not already installed, please follow the instructions at https://docs.docker.com/engine/install/.
+
+# Acknowledgement
+The [OpenCryptoLinux](https://nlnet.nl/project/OpenCryptoLinux/) project is
+funded through the [NGI Assure](https://nlnet.nl/assure) Fund, a fund
+established by [NLnet](https://nlnet.nl/) with financial support from the
+European Commission's [Next Generation Internet](https://ngi.eu/) programme,
+under the aegis of [DG Communications Network, Content and
+Technology](https://commission.europa.eu/about-european-commission/departments-and-executive-agencies/communications-networks-content-and-technology_en)
+under grant agreement No 957073.
+
+<table>
+    <tr>
+        <td align="center" width="50%"><img src="https://nlnet.nl/logo/banner.svg" alt="NLnet foundation logo" style="width:90%"></td>
+        <td align="center"><img src="https://nlnet.nl/image/logos/NGIAssure_tag.svg" alt="NGI Assure logo" style="width:90%"></td>
+    </tr>
+</table>
