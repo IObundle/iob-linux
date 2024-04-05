@@ -148,7 +148,7 @@ def write_linux_sysfs_header(table, out_dir, top, multi=False):
                     f"\tiob_data_write_reg({top}_data.regbase, value, {top.upper()}_{reg_name.upper()}_ADDR, {top.upper()}_{reg_name.upper()}_W);\n"
                 )
             fswhdr.write(f"\tmutex_unlock(&{top}_mutex);\n")
-            fswhdr.write('\tpr_info("Sysfs - Write: 0x%u\\n", value);\n')
+            fswhdr.write(f'\tpr_info("[{top}] Sysfs - Write: 0x%u\\n", value);\n')
             fswhdr.write("\treturn count;\n")
             fswhdr.write("}\n\n")
         elif "R" in row["type"]:
@@ -165,7 +165,7 @@ def write_linux_sysfs_header(table, out_dir, top, multi=False):
                 fswhdr.write(
                     f"\tu32 value = iob_data_read_reg({top}_data.regbase, {top.upper()}_{reg_name.upper()}_ADDR, {top.upper()}_{reg_name.upper()}_W);\n"
                 )
-            fswhdr.write('\tpr_info("Sysfs - Read: 0x%u\\n", value);\n')
+            fswhdr.write(f'\tpr_info("[{top}] Sysfs - Read: 0x%u\\n", value);\n')
             fswhdr.write('\treturn sprintf(buf, "%u", value);\n')
             fswhdr.write("}\n\n")
 
