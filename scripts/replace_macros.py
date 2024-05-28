@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import re
 import sys
+
 
 def macros_inplace_change(filepath, macros_file):
     with open(filepath) as f:
@@ -13,8 +15,23 @@ def macros_inplace_change(filepath, macros_file):
         macro_name, macro_value = macro_line.split()
         s = s.replace(f"/*{macro_name}_MACRO*/", macro_value)
 
+    s = sum_inplace(s)
+
     with open(filepath, "w") as f:
         f.write(s)
+
+
+def sum_inplace(s):
+    # find pattern /*ADDR+OFFSET*/, evaluate as hex values and replace inplace
+    # with result
+    pattern = re.compile(r"\/\*(?P<addr>\w+)\+(?P<offset>\w+)\*\/")
+    matches = pattern.findall(s)
+    for match in matches:
+        match_string = f"/*{match[0]}+{match[1]}*/"
+        sum = hex(int(match[0], 16) + int(match[1], 16))
+        sum = sum.replace("0x", "")  # remove 0x prefix
+        s = s.replace(match_string, sum)
+    return s
 
 
 if __name__ == "__main__":
