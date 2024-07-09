@@ -38,8 +38,9 @@ $(LINUX_DIR):
 		tar -xf $(LINUX_NAME).tar.xz -C $(OS_SUBMODULES_DIR)
 
 ## IOb-SoC Device Tree target
+DTS_FILE ?= $(OS_SOFTWARE_DIR)/iob_soc.dts
 build-dts: $(OS_BUILD_DIR)
-	cp $(OS_SOFTWARE_DIR)/iob_soc.dts $(OS_BUILD_DIR)/iob_soc_tmp.dts
+	cp $(DTS_FILE) $(OS_BUILD_DIR)/iob_soc_tmp.dts
 	$(LINUX_OS_DIR)/scripts/replace_macros.py $(OS_BUILD_DIR)/iob_soc_tmp.dts $(MACROS_FILE)
 	dtc -O dtb -o $(OS_BUILD_DIR)/iob_soc.dtb $(OS_BUILD_DIR)/iob_soc_tmp.dts
 	rm $(OS_BUILD_DIR)/iob_soc_tmp.dts
