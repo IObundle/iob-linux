@@ -68,7 +68,7 @@ def write_linux_swheader(mkregs_obj, table, out_dir, top):
     fswhdr.write("\n")
 
     fswhdr.write("//used address space width\n")
-    fswhdr.write(f"#define {core_prefix}_CSRS_CSRS_ADDR_W {mkregs_obj.core_addr_w}\n\n")
+    fswhdr.write(f"#define {core_prefix}_CSRS_ADDR_W {mkregs_obj.core_addr_w}\n\n")
 
     fswhdr.write("//Addresses\n")
     for row in table:
