@@ -33,6 +33,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
+      - name: remove any old container or image (if exists)
+        run: |
+          docker stop gh_iob_linux_container || true
+          docker rm gh_iob_linux_container || true
+          docker rmi gh_iob_linux || true
       - name: build-container-image
         run: docker build --pull --rm -t gh_iob_linux "."
       - name: run-container

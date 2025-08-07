@@ -38,7 +38,7 @@ def bfs_search_files(search_path):
 
 # Remove registers with address ranges from list
 def filter_table(table):
-    filtered_table = [i for i in table if i['log2n_items'] == 0]
+    filtered_table = [i for i in table if i["log2n_items"] == 0]
     return filtered_table
 
 
@@ -68,7 +68,7 @@ def write_linux_swheader(mkregs_obj, table, out_dir, top):
     fswhdr.write("\n")
 
     fswhdr.write("//used address space width\n")
-    fswhdr.write(f"#define {core_prefix}_SWREG_ADDR_W {mkregs_obj.core_addr_w}\n\n")
+    fswhdr.write(f"#define {core_prefix}_CSRS_ADDR_W {mkregs_obj.core_addr_w}\n\n")
 
     fswhdr.write("//Addresses\n")
     for row in table:
@@ -133,7 +133,9 @@ def write_linux_sysfs_header(table, out_dir, top, multi=False):
             )
             fswhdr.write("\tu32 value = 0;\n")
             if multi:
-                fswhdr.write(f"\tstruct iob_data *{top}_data = (struct iob_data*) dev->platform_data;\n")
+                fswhdr.write(
+                    f"\tstruct iob_data *{top}_data = (struct iob_data*) dev->platform_data;\n"
+                )
             fswhdr.write(f"\tif (!mutex_trylock(&{top}_mutex)) {{\n")
             fswhdr.write('\t\tpr_info("Another process is accessing the device\\n");\n')
             fswhdr.write("\t\treturn -EBUSY;\n")
@@ -157,7 +159,9 @@ def write_linux_sysfs_header(table, out_dir, top, multi=False):
                 f"static ssize_t sysfs_{reg_name}_show(struct device *dev, struct device_attribute *attr, char *buf) {{\n"
             )
             if multi:
-                fswhdr.write(f"\tstruct iob_data *{top}_data = (struct iob_data*) dev->platform_data;\n")
+                fswhdr.write(
+                    f"\tstruct iob_data *{top}_data = (struct iob_data*) dev->platform_data;\n"
+                )
                 fswhdr.write(
                     f"\tu32 value = iob_data_read_reg({top}_data->regbase, {top.upper()}_{reg_name.upper()}_ADDR, {top.upper()}_{reg_name.upper()}_W);\n"
                 )
