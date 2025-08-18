@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+Replace macros/placeholders inside a file with their corresponding value.
+"""
+
 import re
 import sys
 

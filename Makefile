@@ -1,6 +1,8 @@
 LINUX_OS_DIR ?= $(CURDIR)
 OS_SOFTWARE_DIR := $(LINUX_OS_DIR)/software
 OS_BUILD_DIR ?= $(OS_SOFTWARE_DIR)/OS_build
+OPENSBI_PLATFORM_DIR ?= $(OS_SOFTWARE_DIR)/opensbi_platform/iob_soc
+OPENSBI_PLATFORM:=$(shell basename $(OPENSBI_PLATFORM_DIR))
 OS_SUBMODULES_DIR := $(LINUX_OS_DIR)/submodules
 MACROS_FILE ?= $(LINUX_OS_DIR)/build_macros.txt
 REL_BUILD_DIR :=`realpath $(OS_BUILD_DIR) --relative-to=$(LINUX_OS_DIR)`
@@ -13,10 +15,10 @@ $(OS_BUILD_DIR):
 
 ## OpenSBI Linux on RISC-V stage 1 Bootloader (Implements the SBI interface)
 build-opensbi: clean-opensbi $(OS_BUILD_DIR)
-	cp -r $(OS_SOFTWARE_DIR)/opensbi_platform/* $(OS_SUBMODULES_DIR)/OpenSBI/platform/
-	$(LINUX_OS_DIR)/scripts/replace_macros.py $(OS_SUBMODULES_DIR)/OpenSBI/platform/iob_soc/platform.c $(MACROS_FILE)
-	CROSS_COMPILE=riscv64-unknown-linux-gnu- $(MAKE) -C $(OS_SUBMODULES_DIR)/OpenSBI run PLATFORM=iob_soc OS_BUILD_DIR=../../$(REL_BUILD_DIR)
-	rm -r $(OS_SUBMODULES_DIR)/OpenSBI/platform/iob_soc/
+	cp -r $(OPENSBI_PLATFORM_DIR) $(OS_SUBMODULES_DIR)/OpenSBI/platform/
+	$(LINUX_OS_DIR)/scripts/replace_macros.py $(OS_SUBMODULES_DIR)/OpenSBI/platform/$(OPENSBI_PLATFORM)/platform.c $(MACROS_FILE)
+	CROSS_COMPILE=riscv64-unknown-linux-gnu- $(MAKE) -C $(OS_SUBMODULES_DIR)/OpenSBI run PLATFORM=$(OPENSBI_PLATFORM) OS_BUILD_DIR=../../$(REL_BUILD_DIR)
+	rm -r $(OS_SUBMODULES_DIR)/OpenSBI/platform/$(OPENSBI_PLATFORM)/
 
 ## Linux Kernel Makefile Variables and Targets
 LINUX_VERSION?=5.15.98
@@ -37,13 +39,14 @@ $(LINUX_DIR):
 	@wget https://cdn.kernel.org/pub/linux/kernel/v5.x/$(LINUX_NAME).tar.xz && \
 		tar -xf $(LINUX_NAME).tar.xz -C $(OS_SUBMODULES_DIR)
 
-## IOb-SoC Device Tree target
+## Device Tree target
 DTS_FILE ?= $(OS_SOFTWARE_DIR)/iob_soc.dts
+SYSTEM_NAME := $(basename $(notdir $(DTS_FILE)))
 build-dts: $(OS_BUILD_DIR)
-	cp $(DTS_FILE) $(OS_BUILD_DIR)/iob_soc_tmp.dts
-	$(LINUX_OS_DIR)/scripts/replace_macros.py $(OS_BUILD_DIR)/iob_soc_tmp.dts $(MACROS_FILE)
-	dtc -O dtb -o $(OS_BUILD_DIR)/iob_soc.dtb $(OS_BUILD_DIR)/iob_soc_tmp.dts
-	rm $(OS_BUILD_DIR)/iob_soc_tmp.dts
+	cp $(DTS_FILE) $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts
+	$(LINUX_OS_DIR)/scripts/replace_macros.py $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts $(MACROS_FILE)
+	dtc -O dtb -o $(OS_BUILD_DIR)/$(SYSTEM_NAME).dtb $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts
+	rm $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts
 
 ## Buildroot Makefile Variables and Targets
 BUILDROOT_VERSION=buildroot-2022.02.10

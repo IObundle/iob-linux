@@ -2,4 +2,5 @@
 # Script to verify linux functioning
 echo "Test passed!" > /tmp/test.log
 # Send file via UART with Zmodem
+echo "Transfering 'test.log' file via ZMODEM. Press Ctrl-X five or more times during the transfer to abort."
 sz -e /tmp/test.log

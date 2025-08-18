@@ -12,7 +12,7 @@ pkgs.mkShell {
     bash
     gnumake
     dtc
-    (callPackage ./riscv-gnu-toolchain.nix { })
+    (callPackage ./scripts/riscv-gnu-toolchain.nix { })
     # Linux kernel build packages
     libyaml
   ];
