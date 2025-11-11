@@ -49,11 +49,13 @@ build-dts: $(OS_BUILD_DIR)
 	rm $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts
 
 ## Buildroot Makefile Variables and Targets
-BUILDROOT_VERSION=buildroot-2022.02.10
+BUILDROOT_VERSION=buildroot-2025.08.1
 BUILDROOT_DIR=$(OS_SUBMODULES_DIR)/$(BUILDROOT_VERSION)
 
 build-buildroot: $(OS_BUILD_DIR) $(BUILDROOT_DIR)
 	$(MAKE) -C $(BUILDROOT_DIR) BR2_EXTERNAL=$(OS_SOFTWARE_DIR)/buildroot iob_soc_defconfig
+	# PATCH: Apply patch for buildroot-2025.08.1 micropython: https://github.com/buildroot/buildroot/commit/ab906018c98e5f0838b023fa886c6c52a1cc5cf6
+	-cd $(BUILDROOT_DIR) && curl -L https://github.com/buildroot/buildroot/commit/ab906018c98e5f0838b023fa886c6c52a1cc5cf6.patch | patch -p1 -N
 	$(MAKE) -C $(BUILDROOT_DIR) -j`nproc`
 	cp $(BUILDROOT_DIR)/output/images/rootfs.cpio.gz $(OS_BUILD_DIR)
 

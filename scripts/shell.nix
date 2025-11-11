@@ -1,11 +1,4 @@
-{ pkgs ? import (builtins.fetchTarball {
-  # Descriptive name to make the store path easier to identify
-  name = "nixos-22.11";
-  # Commit hash for nixos-22.11
-  url = "https://github.com/NixOS/nixpkgs/archive/refs/tags/22.11.tar.gz";
-  # Hash obtained using `nix-prefetch-url --unpack <url>`
-  sha256 = "11w3wn2yjhaa5pv20gbfbirvjq6i3m7pqrq2msf0g7cv44vijwgw";
-}) {}}:
+{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/25.05.tar.gz") {}}:
 pkgs.mkShell {
   name = "iob-shell";
   buildInputs = with pkgs; [     
@@ -15,5 +8,14 @@ pkgs.mkShell {
     (callPackage ./scripts/riscv-gnu-toolchain.nix { })
     # Linux kernel build packages
     libyaml
+    ncurses
   ];
+  shellHook = ''
+    # fixes libstdc++.so.6 issues of buildroot's patchelf
+    export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib
+  '';
+
+  # Disable hardening flags for gcc. Prevents errors when running buildroot, like these:
+  # https://github.com/riscv-collab/riscv-gnu-toolchain/issues/901
+  hardeningDisable = [ "all" ];
 }
