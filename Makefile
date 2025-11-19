@@ -87,15 +87,15 @@ run-qemu:
 OS_DRIVERS_DIR ?= $(OS_SOFTWARE_DIR)/drivers
 MODULE_NAME ?= ""
 MODULE_DRIVER_DIR ?= ""
+MODULE_CSRS_HEADER ?= $(MODULE_DRIVER_DIR)/../../src/*_csrs_conf.h
 CALLING_DIR ?= ../../
 ROOTFS_OVERLAY_DIR ?= ../../
 PYTHON_DIR ?= ../../
 build-linux-drivers: build-linux-kernel
 	# copy driver sources to software/drivers
 	cp $(MODULE_DRIVER_DIR)/* $(OS_DRIVERS_DIR)
-	# generate linux driver header
-	cd $(CALLING_DIR) && \
-		$(CURDIR)/scripts/drivers.py $(MODULE_NAME) -o `realpath $(CURDIR)/software/drivers --relative-to=$(CALLING_DIR)`
+	# copy module's *_csrs_conf.h header
+	cp $(MODULE_CSRS_HEADER) $(OS_DRIVERS_DIR)
 	# compile linux kernel module
 	make -C $(OS_DRIVERS_DIR) all LINUX_DIR=`realpath $(LINUX_DIR) --relative-to=./software/drivers` MODULE_NAME=$(MODULE_NAME)
 	# copy drivers to rootfs overlay

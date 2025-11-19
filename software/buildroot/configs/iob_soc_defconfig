@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 ## Build options
 BR2_CCACHE=y
 BR2_CCACHE_DIR="$(HOME)/.buildroot-ccache-saxon_default"
