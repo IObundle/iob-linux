@@ -98,8 +98,8 @@ build-linux-drivers: build-linux-kernel
 	cp $(MODULE_CSRS_HEADER) $(OS_DRIVERS_DIR)
 	# compile linux kernel module
 	make -C $(OS_DRIVERS_DIR) all LINUX_DIR=`realpath $(LINUX_DIR) --relative-to=./software/drivers` MODULE_NAME=$(MODULE_NAME)
-	# copy drivers to rootfs overlay
-	cp -r $(OS_DRIVERS_DIR) $(ROOTFS_OVERLAY_DIR)/
+	# copy driver to rootfs overlay
+	cp $(OS_DRIVERS_DIR)/*.ko $(ROOTFS_OVERLAY_DIR)/
 	make clean-linux-drivers
 
 #

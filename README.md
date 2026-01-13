@@ -28,6 +28,17 @@ Cleans the Linux kernel build artifacts.
 ### `clean-buildroot`
 Cleans the Buildroot build artifacts.
 
+Note: Sometimes rebuilding buildroot without a full clean of previous build artifacts may result in a kernel panic when running the OS with the generated rootfs.
+```bash
+/init: exec: line 15: /sbin/init: not found
+[ 27.685585] Kernel panic - not syncing: Attempted to kill init! exitcode=0x00007f00
+```
+A full clean of previous build artifacts and rebuilding buildroot seems resolve the issue. This issue may be caused by new build tool versions/updates in the development machine.
+```bash
+make clean-linux-kernel clean-buildroot  # Clean previous build artifacts
+make build-linux-kernel build-buildroot  # (Re)Build Linux kernel and Buildroot
+```
+
 ## Makefile Variables
 - `LINUX_OS_DIR`: Specifies the directory where the Linux OS is being built. The default value is the current working directory (`$(CURDIR)`).
 - `OS_SOFTWARE_DIR`: Specifies the directory containing software-related files for the OS, such as configuration files and scripts.
