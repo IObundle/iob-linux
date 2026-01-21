@@ -43,8 +43,11 @@ $(LINUX_DIR):
 DTS_FILE ?= $(OS_SOFTWARE_DIR)/iob_soc.dts
 SYSTEM_NAME := $(basename $(notdir $(DTS_FILE)))
 build-dts: $(OS_BUILD_DIR)
-	cp $(DTS_FILE) $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts
+	# Replace #include statements with the corresponding .dtsi file contents, and place it in output dir $(OS_BUILD_DIR)
+	cpp -nostdinc -undef -D__DTS__ -x assembler-with-cpp -C -I $(OS_BUILD_DIR) $(DTS_FILE) $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts
+	# Replace macros
 	$(LINUX_OS_DIR)/scripts/replace_macros.py $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts $(MACROS_FILE)
+	# Build the device tree
 	dtc -O dtb -o $(OS_BUILD_DIR)/$(SYSTEM_NAME).dtb $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts
 	rm $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts
 

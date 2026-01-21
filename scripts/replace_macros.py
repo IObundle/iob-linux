@@ -16,8 +16,8 @@ def macros_inplace_change(filepath, macros_file):
         macro_lines = f.readlines()
 
     for macro_line in macro_lines:
-        macro_name, macro_value = macro_line.split()
-        s = s.replace(f"/*{macro_name}_MACRO*/", macro_value)
+        macro_name, macro_value = macro_line.split(' ', 1)
+        s = s.replace(f"/*{macro_name}_MACRO*/", macro_value.strip())
 
     s = sum_inplace(s)
 
