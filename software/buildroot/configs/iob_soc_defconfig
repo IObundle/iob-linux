@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 ## Build options
 BR2_CCACHE=y
 BR2_CCACHE_DIR="$(HOME)/.buildroot-ccache-saxon_default"
@@ -14,7 +18,7 @@ BR2_RISCV_32=y
 BR2_RISCV_ABI_ILP32=y
 
 ## Linux headers same as kernel
-BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_15=y
+BR2_KERNEL_HEADERS_5_15=y
 
 ## System
 BR2_TARGET_GENERIC_GETTY=y

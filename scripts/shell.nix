@@ -9,6 +9,8 @@ pkgs.mkShell {
     # Linux kernel build packages
     libyaml
     ncurses
+    # Buildroot
+    bc
   ];
   shellHook = ''
     # fixes libstdc++.so.6 issues of buildroot's patchelf

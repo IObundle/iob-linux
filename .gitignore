@@ -6,7 +6,7 @@
 !/.gitignore
 !/.gitmodules
 !/.github
-!/iob_linux.py
+!/iob_linux
 !/config.mk
 !/Dockerfile
 !/Makefile

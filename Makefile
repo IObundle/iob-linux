@@ -43,8 +43,11 @@ $(LINUX_DIR):
 DTS_FILE ?= $(OS_SOFTWARE_DIR)/iob_soc.dts
 SYSTEM_NAME := $(basename $(notdir $(DTS_FILE)))
 build-dts: $(OS_BUILD_DIR)
-	cp $(DTS_FILE) $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts
+	# Replace #include statements with the corresponding .dtsi file contents, and place it in output dir $(OS_BUILD_DIR)
+	cpp -nostdinc -undef -D__DTS__ -x assembler-with-cpp -C -I $(OS_BUILD_DIR) $(DTS_FILE) $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts
+	# Replace macros
 	$(LINUX_OS_DIR)/scripts/replace_macros.py $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts $(MACROS_FILE)
+	# Build the device tree
 	dtc -O dtb -o $(OS_BUILD_DIR)/$(SYSTEM_NAME).dtb $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts
 	rm $(OS_BUILD_DIR)/$(SYSTEM_NAME)_tmp.dts
 
@@ -87,19 +90,19 @@ run-qemu:
 OS_DRIVERS_DIR ?= $(OS_SOFTWARE_DIR)/drivers
 MODULE_NAME ?= ""
 MODULE_DRIVER_DIR ?= ""
+MODULE_CSRS_HEADER ?= $(MODULE_DRIVER_DIR)/../../src/*_csrs_conf.h
 CALLING_DIR ?= ../../
 ROOTFS_OVERLAY_DIR ?= ../../
 PYTHON_DIR ?= ../../
 build-linux-drivers: build-linux-kernel
 	# copy driver sources to software/drivers
 	cp $(MODULE_DRIVER_DIR)/* $(OS_DRIVERS_DIR)
-	# generate linux driver header
-	cd $(CALLING_DIR) && \
-		$(CURDIR)/scripts/drivers.py $(MODULE_NAME) -o `realpath $(CURDIR)/software/drivers --relative-to=$(CALLING_DIR)`
+	# copy module's *_csrs_conf.h header
+	cp $(MODULE_CSRS_HEADER) $(OS_DRIVERS_DIR)
 	# compile linux kernel module
 	make -C $(OS_DRIVERS_DIR) all LINUX_DIR=`realpath $(LINUX_DIR) --relative-to=./software/drivers` MODULE_NAME=$(MODULE_NAME)
-	# copy drivers to rootfs overlay
-	cp -r $(OS_DRIVERS_DIR) $(ROOTFS_OVERLAY_DIR)/
+	# copy driver to rootfs overlay
+	cp $(OS_DRIVERS_DIR)/*.ko $(ROOTFS_OVERLAY_DIR)/
 	make clean-linux-drivers
 
 #
