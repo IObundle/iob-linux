@@ -29,7 +29,7 @@ LINUX_IMAGE=$(LINUX_DIR)/arch/riscv/boot/Image
 build-linux-kernel: $(OS_BUILD_DIR) $(LINUX_IMAGE)
 		cp $(LINUX_IMAGE) $(OS_BUILD_DIR)
 
-$(LINUX_IMAGE): $(LINUX_DIR)
+$(LINUX_IMAGE): $(LINUX_DIR) $(OS_SOFTWARE_DIR)/linux_config
 	cd $(LINUX_DIR) && \
 		cp $(OS_SOFTWARE_DIR)/linux_config ./arch/riscv/configs/iob_soc_defconfig && \
 		$(MAKE) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- iob_soc_defconfig && \
