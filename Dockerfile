@@ -14,7 +14,7 @@ RUN apt-get update && \
 # and gcc.gnu.org, which rate-limit with HTTP 429 on Docker builds.
 # Clone submodules sequentially to avoid GitHub's unauthenticated rate limit.
 RUN git clone https://github.com/riscv-collab/riscv-gnu-toolchain.git && \
-    cd riscv-gnu-toolchain && git checkout 2023.02.25 && \
+    cd riscv-gnu-toolchain && git checkout 2026.07.15 && \
     sed -i \
       -e 's|https://sourceware.org/git/binutils-gdb.git|https://github.com/RTEMS/sourceware-mirror-binutils-gdb.git|g' \
       -e 's|https://sourceware.org/git/glibc.git|https://github.com/bminor/glibc.git|g' \
