@@ -10,11 +10,17 @@ WORKDIR /iob_linux
 RUN apt-get update && \
     apt-get install -y device-tree-compiler autoconf automake autotools-dev curl python3 python3-setuptools libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev ninja-build bash binutils bzip2 cpio g++ gcc git gzip make patch perl rsync sed tar unzip wget file sudo locales mercurial libncurses5-dev libfdt-dev libglib2.0-dev libpixman-1-dev
 
-# Initialize submodules sequentially before the parallel build to avoid
-# HTTP 429 (rate limiting) from sourceware.org and gcc.gnu.org, which
-# reject connections when multiple clones hit them at the same time.
+# Rewrite submodule URLs to use GitHub mirrors instead of sourceware.org
+# and gcc.gnu.org, which rate-limit with HTTP 429 on Docker builds.
+# Clone submodules sequentially to avoid GitHub's unauthenticated rate limit.
 RUN git clone https://github.com/riscv-collab/riscv-gnu-toolchain.git && \
     cd riscv-gnu-toolchain && git checkout 2023.02.25 && \
+    sed -i \
+      -e 's|https://sourceware.org/git/binutils-gdb.git|https://github.com/RTEMS/sourceware-mirror-binutils-gdb.git|g' \
+      -e 's|https://sourceware.org/git/glibc.git|https://github.com/bminor/glibc.git|g' \
+      -e 's|https://sourceware.org/git/newlib-cygwin.git|https://github.com/RTEMS/sourceware-mirror-newlib-cygwin.git|g' \
+      -e 's|https://gcc.gnu.org/git/gcc.git|https://github.com/gcc-mirror/gcc.git|g' \
+      .gitmodules && \
     git submodule init && git submodule update --jobs 1 && \
     ./configure --prefix=/opt/riscv --enable-multilib && make linux -j$(nproc) && \
     rm -rf /iob_linux/riscv-gnu-toolchain
